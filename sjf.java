@@ -1,70 +1,69 @@
-// Java program for implementation of SFJ CPU Scheduling Algorithm
-
-import java.io.*
 import java.util.*;
 
-public class Main {
-	public static void main(String[] args)
-	{
-		Scanner input = new Scanner(System.in);
-		int n;
-		// Matrix for storing Process Id, Burst
-		// Time, Average Waiting Time & Average
-		// Turn Around Time.
-		int[][] A = new int[100][4];
-		int total = 0;
-		float avg_wt, avg_tat;
-		System.out.println("Enter number of process:");
-		n = input.nextInt();
-		System.out.println("Enter Burst Time:");
-		for (int i = 0; i < n; i++) {
-			// User Input Burst Time and alloting
-			// Process Id.
-			System.out.print("P" + (i + 1) + ": ");
-			A[i][1] = input.nextInt();
-			A[i][0] = i + 1;
-		}
-		for (int i = 0; i < n; i++) {
-			// Sorting process according to their
-			// Burst Time.
-			int index = i;
-			for (int j = i + 1; j < n; j++) {
-				if (A[j][1] < A[index][1]) {
-					index = j;
-				}
-			}
-			int temp = A[i][1];
-			A[i][1] = A[index][1];
-			A[index][1] = temp;
-			temp = A[i][0];
-			A[i][0] = A[index][0];
-			A[index][0] = temp;
-		}
-		A[0][2] = 0;
-		// Calculation of Waiting Times
-		for (int i = 1; i < n; i++) {
-			A[i][2] = 0;
-			for (int j = 0; j < i; j++) {
-				A[i][2] += A[j][1];
-			}
-			total += A[i][2];
-		}
-		avg_wt = (float)total / n;
-		total = 0;
-		// Calculation of Turn Around Time and printing the
-		// data.
-		System.out.println("P\tBT\tWT\tTAT");
-		for (int i = 0; i < n; i++) {
-			A[i][3] = A[i][1] + A[i][2];
-			total += A[i][3];
-			System.out.println("P" + A[i][0] + "\t"
-							+ A[i][1] + "\t" + A[i][2]
-							+ "\t" + A[i][3]);
-		}
-		avg_tat = (float)total / n;
-		System.out.println("Average Waiting Time= "
-						+ avg_wt);
-		System.out.println("Average Turnaround Time= "
-						+ avg_tat);
-	}
+class ShortestJobFirst {
+
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter number of process: ");
+        int n = sc.nextInt();
+
+        int process[] = new int[n];
+        int burstTime[] = new int[n];
+        int waitingTime[] = new int[n];
+        int turnAroundTime[] = new int[n];
+
+        int i, j, total = 0, pos, temp;
+        float avgWaitingTime, avgTurnAroundTime;
+
+        System.out.println("\nEnter Burst time:");
+        for (i = 0; i < n; i++) {
+            System.out.print("\nProcess[" + (i + 1) + "]: ");
+            burstTime[i] = sc.nextInt();
+            process[i] = i + 1;
+        }
+
+        //Sorting according to burst time. In SJF process with
+        // least burst time is scheduled first.
+        for (i = 0; i < n; i++) {
+            pos = i;
+            for (j = i + 1; j < n; j++) {
+                if (burstTime[j] < burstTime[pos])
+                    pos = j;
+            }
+
+            temp = burstTime[i];
+            burstTime[i] = burstTime[pos];
+            burstTime[pos] = temp;
+
+            temp = process[i];
+            process[i] = process[pos];
+            process[pos] = temp;
+        }
+
+        waitingTime[0] = 0;
+//calculate waiting time for every process
+        for (i = 1; i < n; i++) {
+            waitingTime[i] = 0;
+            for (j = 0; j < i; j++)
+                waitingTime[i] += burstTime[j];
+            total += waitingTime[i];
+        }
+
+//Calculating Average waiting time
+        avgWaitingTime = (float) total / n;
+        total = 0;
+
+        System.out.println("\nProcess\t Burst Time \tWaiting Time\tTurnaround Time");
+        for (i = 0; i < n; i++) {
+            turnAroundTime[i] = burstTime[i] + waitingTime[i]; //Calculating Turnaround Time
+            total += turnAroundTime[i];
+            System.out.println("\n p" + process[i] + "\t\t " + burstTime[i] + "\t\t " + waitingTime[i] + "\t\t " + turnAroundTime[i]);
+        }
+
+//Calculation of Average Turnaround Time
+        avgTurnAroundTime = (float) total / n;
+        System.out.println("\n\nAverage Waiting Time: " + avgWaitingTime);
+        System.out.println("\nAverage Turnaround Time: " + avgTurnAroundTime);
+
+    }
 }
